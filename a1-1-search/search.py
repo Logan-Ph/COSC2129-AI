@@ -210,8 +210,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     pq = util.PriorityQueue()
     
     # Push the start state, an empty path, and a cost of 0 onto the priority queue
-    start_state = problem.getStartState()
-    pq.push((start_state, [], 0), 0)
+    pq.push((problem.getStartState(), [], 0), 0)
     
     # Continue searching while the priority queue is not empty
     while not pq.isEmpty():
@@ -235,7 +234,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                     
                     # Calculate the f-score by adding the cost and heuristic value
                     fScore = newCost + heuristic(successor, problem)
-                    print(heuristic(successor, problem))
                     
                     # Push the successor state, updated path, and new cost onto the priority queue
                     pq.push((successor, path + [action], newCost), fScore)
