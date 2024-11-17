@@ -87,35 +87,33 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    
-    # Initialize an empty set to keep track of visited states
-    visited = set()
-    
-    # Create a stack to store the states to be explored
-    stack = util.Stack()
-    
-    # Push the start state and an empty path onto the stack
-    stack.push((problem.getStartState(), []))
+    visited = set() # Set initialization to keep track of visited states
+    stack = util.Stack() # Stack initialization to store the states to be explored
+    stack.push((problem.getStartState(), [])) # Push the start state and an empty path onto the stack
     
     # Continue searching while the stack is not empty
     while not stack.isEmpty():
         # Pop the current state and its corresponding path from the stack
-        state, path = stack.pop()
+        current_state, path = stack.pop()
         
         # If the current state is the goal state, return the path to reach it
-        if problem.isGoalState(state):
+        if problem.isGoalState(current_state):
             return path
 
         # If the current state has not been visited before
-        if state not in visited:
+        if current_state not in visited:
             # Mark the current state as visited
-            visited.add(state)
+            visited.add(current_state)
             
             # Explore each unvisited successor of the current state
-            for successor, next_move, cost in problem.getSuccessors(state):
-                if successor not in visited:
+            for successor in problem.getSuccessors(current_state):
+                # Unpack the successor tuple
+                new_state, action, cost = successor
+                
+                # If the successor state has not been visited before
+                if new_state not in visited and new_state not in [x[0] for x in stack.list]:
                     # Push the successor state and the updated path onto the stack
-                    stack.push((successor, path + [next_move]))
+                    stack.push((new_state, path + [action]))
 
     # If no goal state is found and the stack becomes empty, return an empty path
     return []
@@ -123,34 +121,33 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    # Initialize an empty set to keep track of visited states
-    visited = set()
+    visited = set() # Set initialization to keep track of visited states
+    queue = util.Queue() # Queue initialization to store the states to be explored
+    queue.push((problem.getStartState(), [])) # Push the start state and an empty path onto the queue
     
-    # Create a queue to store the states to be explored
-    queue = util.Queue()
-    
-    # Push the start state and an empty path onto the queue
-    queue.push((problem.getStartState(), []))
-
     # Continue searching while the queue is not empty
     while not queue.isEmpty():
         # Pop the current state and its corresponding path from the queue
-        state, path = queue.pop()
+        current_state, path = queue.pop()
         
         # If the current state is the goal state, return the path to reach it
-        if problem.isGoalState(state):
+        if problem.isGoalState(current_state):
             return path
 
         # If the current state has not been visited before
-        if state not in visited:
+        if current_state not in visited:
             # Mark the current state as visited
-            visited.add(state)
+            visited.add(current_state)
             
             # Explore each unvisited successor of the current state
-            for successor, next_move, cost in problem.getSuccessors(state):
-                if successor not in visited:
+            for successor in problem.getSuccessors(current_state):
+                # Unpack the successor tuple
+                new_state, action, cost = successor
+                
+                # If the successor state has not been visited before
+                if new_state not in visited and new_state not in [x[0] for x in queue.list]:
                     # Push the successor state and the updated path onto the queue
-                    queue.push((successor, path + [next_move]))
+                    queue.push((new_state, path + [action]))
 
     # If no goal state is found and the queue becomes empty, return an empty path
     return []
@@ -158,37 +155,36 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-        # Initialize an empty set to keep track of visited states
-    visited = set()
-    
-    # Create a priority queue to store the states to be explored
-    pq = util.PriorityQueue()
-    
-    # Push the start state, an empty path, and a cost of 0 onto the priority queue
-    pq.push((problem.getStartState(), [], 0), 0)
+    visited = set() # Set initialization to keep track of visited states
+    priority_queue = util.PriorityQueue() # Priority queue initialization to store the states to be explored
+    priority_queue.push((problem.getStartState(), [], 0), 0) # Push the start state, an empty path, and a cost of 0 onto the priority queue
     
     # Continue searching while the priority queue is not empty
-    while not pq.isEmpty():
+    while not priority_queue.isEmpty():
         # Pop the state, path, and cost with the lowest cost from the priority queue
-        state, path, cost = pq.pop()
+        current_state, path, current_cost = priority_queue.pop()
         
         # If the current state is the goal state, return the path to reach it
-        if problem.isGoalState(state):
+        if problem.isGoalState(current_state):
             return path
         
         # If the current state has not been visited before
-        if state not in visited:
+        if current_state not in visited:
             # Mark the current state as visited
-            visited.add(state)
+            visited.add(current_state)
             
             # Explore each unvisited successor of the current state
-            for successor, action, stepCost in problem.getSuccessors(state):
-                if successor not in visited:
+            for successor in problem.getSuccessors(current_state):
+                # Unpack the successor tuple
+                new_state, action, stepCost = successor
+                
+                # If the successor state has not been visited before
+                if new_state not in visited:
                     # Calculate the new cost to reach the successor
-                    newCost = cost + stepCost
+                    newCost = current_cost + stepCost
                     
                     # Push the successor state, updated path, and new cost onto the priority queue
-                    pq.push((successor, path + [action], newCost), newCost)
+                    priority_queue.push((new_state, path + [action], newCost), newCost)
     
     # If no goal state is found and the priority queue becomes empty, return an empty path
     return []
@@ -203,41 +199,40 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    # Initialize an empty set to keep track of visited states
-    visited = set()
-    
-    # Create a priority queue to store the nodes to be explored
-    pq = util.PriorityQueue()
-    
-    # Push the start state, an empty path, and a cost of 0 onto the priority queue
-    pq.push((problem.getStartState(), [], 0), 0)
+    visited = set() # Set initialization to keep track of visited states
+    priority_queue = util.PriorityQueue() # Priority queue initialization to store the nodes to be explored
+    priority_queue.push((problem.getStartState(), [], 0), 0) # Push the start state, an empty path, and a cost of 0 onto the priority queue
     
     # Continue searching while the priority queue is not empty
-    while not pq.isEmpty():
+    while not priority_queue.isEmpty():
         # Pop the node with the lowest f-score (cost + heuristic) from the priority queue
-        state, path, cost = pq.pop()
+        current_state, path, current_cost = priority_queue.pop()
         
         # If the current state is the goal state, return the path to reach it
-        if problem.isGoalState(state):
+        if problem.isGoalState(current_state):
             return path
         
         # If the current state has not been visited before
-        if state not in visited:
+        if current_state not in visited:
             # Mark the current state as visited
-            visited.add(state)
+            visited.add(current_state)
             
             # Explore each unvisited successor of the current state
-            for successor, action, stepCost in problem.getSuccessors(state):
-                if successor not in visited:
+            for successor in problem.getSuccessors(current_state):
+                # Unpack the successor tuple
+                new_state, action, stepCost = successor
+                
+                # If the successor state has not been visited before
+                if new_state not in visited:
                     # Calculate the new cost to reach the successor
-                    newCost = cost + stepCost
+                    newCost = current_cost + stepCost
                     
                     # Calculate the f-score by adding the cost and heuristic value
-                    fScore = newCost + heuristic(successor, problem)
+                    fScore = newCost + heuristic(new_state, problem)
                     
                     # Push the successor state, updated path, and new cost onto the priority queue
-                    pq.push((successor, path + [action], newCost), fScore)
-    
+                    priority_queue.push((new_state, path + [action], newCost), fScore)
+
     # If no goal state is found and the priority queue becomes empty, return an empty path
     return []
 
@@ -253,21 +248,16 @@ def iterativeDeepeningSearch(problem):
     
     depth_limit = 0 
     while True:
-        # Initialize a stack for storing states
-        stack = util.Stack()
-        
-        # Push the start state and an empty path and the current depth onto the stack 
-        stack.push((problem.getStartState(), [], 0))
-        
-        # Initialize an empty set to keep track of visited states at each depth
-        visited = set()
+        stack = util.Stack() # Initialize a stack for storing states
+        stack.push((problem.getStartState(), [], 0)) # Push the start state and an empty path and the current depth onto the stack 
+        visited = set() # Initialize an empty set to keep track of visited states at each depth
         
         while not stack.isEmpty():
             # Pop the current state, its corresponding path, and depth from the stack
-            state, path, depth = stack.pop()
+            current_state, path, depth = stack.pop()
             
             # If the current state is the goal state, return the path to reach it
-            if problem.isGoalState(state):
+            if problem.isGoalState(current_state):
                 return path
             
             # If the current depth exceeds the depth limit, continue to the next iteration
@@ -275,14 +265,17 @@ def iterativeDeepeningSearch(problem):
                 continue
             
             # If the current state has not been visited at this depth
-            if (state, depth) not in visited:
+            if (current_state, depth) not in visited:
                 # Mark the current state as visited at this depth
-                visited.add((state, depth))
+                visited.add((current_state, depth))
                 
                 # Explore each unvisited successor of the current state
-                for successor, next_move, cost in problem.getSuccessors(state):
+                for successor in problem.getSuccessors(current_state):
+                    # Unpack the successor tuple
+                    new_state, action, stepCost = successor
+                    
                     # Push the successor state, the updated path, and the incremented depth onto the stack
-                    stack.push((successor, path + [next_move], depth + 1))
+                    stack.push((new_state, path + [action], depth + 1))
         
         # Increment the depth limit for the next iteration
         depth_limit += 1
